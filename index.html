@@ -4914,6 +4914,7 @@ body.cinelook:not(.in-menu) #fx::after { opacity: 0.07; animation: grain 0.9s st
 
 
 
+</style>
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -10843,13 +10844,13 @@ const Net = {
     const q = NET_Q;
     const o = {
       debug: 0,
-      config: { iceServers: NetIce.servers() },
+      config: { iceServers: NetIce.servers(), iceCandidatePoolSize: 10, sdpSemantics: 'unified-plan' },
     };
     if (q.get('peerhost')) { o.host = q.get('peerhost'); o.port = +(q.get('peerport') || 9000); o.path = q.get('peerpath') || '/'; o.secure = q.get('peersecure') === '1'; }
     return o;
   },
   createPeer(id) {
-    return this.loadLib().then(() => new Promise((res, rej) => {
+    return this.loadLib().then(() => NetIce.init()).then(() => new Promise((res, rej) => {
       const p = id ? new Peer(id, this.opts()) : new Peer(this.opts());
       let done = false;
       const t = setTimeout(() => { if (!done) { done = true; try { p.destroy(); } catch (e) { } rej(new Error('Connection to the matchmaking server timed out')); } }, 12000);
@@ -13564,6 +13565,8 @@ const Menus = {
     if (res.error) {
       box.innerHTML = row('', 'ONLINE PLAY ISN\'T REACHABLE', esc(res.error), 'live', `<button class="jpill" data-pub="retry">RETRY</button>`);
     } else {
+      this._pub = res;
+      try { if (typeof Home !== 'undefined') { Home._pub = res; Home.livePanel(); } } catch (e) { console.warn('public lobby paint', e); }
       box.innerHTML = res.map(r => {
         if (r.empty) return row(MAPS[(r.slot * 5 + 3) % MAPS.length].th, 'OPEN LOBBY ' + (r.slot + 1), 'No match yet: host it, others can join', 'idle', `<button class="jpill" data-pub="host">HOST</button>`);
         const i = r.info, md = MAPS.find(m => m.id === i.mapId) || MAPS[0];
@@ -16529,9 +16532,9 @@ const Home = {
     paint();
     this._pwT = setTimeout(async () => {
       if (App.mode !== 'menu' || !$('#home') || Menus.session) return;
-      if ($('#modalWrap').classList.contains('hidden') && !document.hidden && performance.now() - Perf.lastInput < 60000) { try { const r = await Net.probePublic(); if (Array.isArray(r)) this._pub = r; } catch (e) { } }
+      if ($('#modalWrap').classList.contains('hidden') && !document.hidden) { try { const r = await Net.probePublic(); if (Array.isArray(r)) this._pub = r; } catch (e) { } }
       this.pubWatch();
-    }, this._pub ? (this.mode().key === 'online' ? 8000 : 12000) : 900);
+    }, this._pub ? (this.mode().key === 'online' ? 5000 : 7000) : 900);
   },
   // the difficulty, always in sight next to PLAY (many players never found out that Hard, Insane and Ultra exist)
   DIFF_COL: ['#34d399', '#4fb4ff', '#ffb547', '#ff5a5a', '#c47bff'],
@@ -17766,16 +17769,18 @@ Object.assign(Menus, {
 //   'https://DEINNAME.metered.live/api/v1/turn/credentials?apiKey=DEIN_KEY'   (metered.ca, free: 20 GB a month)
 const TURN_URL = '';
 const NetIce = {
-  own: null, open: null,
+  own: null, open: null, ready: null,
   servers() {
-    const l = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
+    const l = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }];
     if (this.own && this.own.length) return l.concat(this.own.slice(0, 4));
     // the relay of the PeerJS cloud (the same servers the library uses by itself) and the Open Relay project
     l.push({ urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp' });
     if (this.open) l.push(this.open);
     return l;
   },
-  async init() {
+  init() {
+    if (this.ready) return this.ready;
+    this.ready = (async () => {
     try {
       // Open Relay hands out time-limited logins: the user name is the time they end, the password its signature
       const enc = (t) => new TextEncoder().encode(t), user = String(Math.floor(Date.now() / 1000) + 86400);
@@ -17784,6 +17789,8 @@ const NetIce = {
       this.open = { urls: ['turn:staticauth.openrelay.metered.ca:80', 'turns:staticauth.openrelay.metered.ca:443?transport=tcp'], username: user, credential: btoa(String.fromCharCode(...sig)) };
     } catch (e) { }
     if (TURN_URL) { try { const r = await fetch(TURN_URL), l = await r.json(); if (Array.isArray(l) && l.length) this.own = l.filter(x => x && x.urls && /^turns?:/.test(String(Array.isArray(x.urls) ? x.urls[0] : x.urls))); } catch (e) { console.warn('own relay not reachable', e); } }
+    })();
+    return this.ready;
   },
 };
 NetIce.init();
