@@ -1862,6 +1862,34 @@ const SKINS = [   // id = the pattern number the map shader paints
   { key: 'lava', id: 9, name: 'Lava', rarity: 'Epic', wins: 0, weight: 0, premium: 18 },
   { key: 'aurora', id: 10, name: 'Aurora', rarity: 'Legendary', wins: 0, weight: 0, premium: 10 },
   { key: 'galaxy', id: 11, name: 'Galaxy', rarity: 'Ultra', wins: 0, weight: 0, premium: 5 },
+  { key: 'checker', id: 12, name: 'Checkerboard', rarity: 'Common', wins: 5, weight: 24 },
+  { key: 'tiger', id: 13, name: 'Tiger', rarity: 'Uncommon', wins: 12, weight: 18 },
+  { key: 'honey', id: 14, name: 'Honeycomb', rarity: 'Uncommon', wins: 14, weight: 18 },
+  { key: 'ocean', id: 15, name: 'Ocean', rarity: 'Rare', wins: 18, weight: 14 },
+  { key: 'marble', id: 16, name: 'Marble', rarity: 'Rare', wins: 22, weight: 14 },
+  { key: 'sunset', id: 17, name: 'Sunset', rarity: 'Rare', wins: 24, weight: 14 },
+  { key: 'toxic', id: 18, name: 'Toxic', rarity: 'Epic', wins: 28, weight: 8 },
+  { key: 'circuit', id: 19, name: 'Circuit', rarity: 'Epic', wins: 32, weight: 7 },
+  { key: 'sakura', id: 20, name: 'Sakura', rarity: 'Epic', wins: 34, weight: 7 },
+  { key: 'plasma', id: 21, name: 'Plasma', rarity: 'Legendary', wins: 40, weight: 3 },
+  { key: 'diamond', id: 22, name: 'Diamond', rarity: 'Legendary', wins: 45, weight: 3 },
+  { key: 'blueprint', id: 23, name: 'Blueprint', rarity: 'Rare', wins: 26, weight: 12 },
+  { key: 'topo', id: 24, name: 'Topographic', rarity: 'Epic', wins: 38, weight: 6 },
+  { key: 'holo', id: 25, name: 'Hologram', rarity: 'Ultra', wins: 0, weight: 0, premium: 6 },
+  { key: 'carbon', id: 26, name: 'Carbon', rarity: 'Epic', wins: 42, weight: 6 },
+  { key: 'zebra', id: 27, name: 'Zebra', rarity: 'Common', wins: 8, weight: 24 },
+  { key: 'polka', id: 28, name: 'Polka Dots', rarity: 'Common', wins: 6, weight: 24 },
+  { key: 'bricks', id: 29, name: 'Bricks', rarity: 'Uncommon', wins: 16, weight: 18 },
+  { key: 'vapor', id: 30, name: 'Vaporwave', rarity: 'Rare', wins: 27, weight: 13 },
+  { key: 'glacier', id: 31, name: 'Glacier', rarity: 'Rare', wins: 23, weight: 13 },
+  { key: 'matrix', id: 32, name: 'Matrix', rarity: 'Epic', wins: 36, weight: 7 },
+  { key: 'royal', id: 33, name: 'Royal', rarity: 'Epic', wins: 33, weight: 7 },
+  { key: 'inferno', id: 34, name: 'Inferno', rarity: 'Legendary', wins: 48, weight: 3 },
+  { key: 'void', id: 35, name: 'Void', rarity: 'Legendary', wins: 44, weight: 3 },
+  { key: 'prism', id: 36, name: 'Prism', rarity: 'Ultra', wins: 0, weight: 0, premium: 4 },
+  // only from the Battle Pass
+  { key: 'pioneer', id: 37, name: 'Pioneer', rarity: 'Epic', wins: 0, weight: 0, premium: 1e-9, pass: 10 },
+  { key: 'champion', id: 38, name: 'Champion', rarity: 'Legendary', wins: 0, weight: 0, premium: 1e-9, pass: 30 },
 ];
 const FXS = [
   { key: 'classic', name: 'Classic fireworks', rarity: 'Common', colors: [0xffd04a, 0xffffff, 0x4ade80] },
@@ -1928,17 +1956,19 @@ function unitCost(kind, count) {
 // seconds before bots attack a human player unprovoked, and how many nations may attack one human at once
 const HUMAN_GRACE = [300, 150, 60, 0];
 const HUMAN_CAP = [1, 1, 2, 99];
-const HUMAN_HIT = [0.65, 0.9, 1, 1];          // share of the usual attack size bots send against a human
+const HUMAN_HIT = [0.65, 0.9, 1, 1, 1.05, 1.1];          // share of the usual attack size bots send against a human
 const HUMAN_DEF = [1.3, 1.08, 1, 1];           // each tile of a human costs bots this much more to take
 const HUMAN_REST = [450, 150, 0, 0];          // ticks of peace a human gets after a bot attack on them ends
 const CITY_CAP = [80, 120, 0, 0];
 const NUKE_GAP = [0, 900, 300, 100];          // ticks between two bot nukes aimed at the same player (0 = bots never nuke)
 const NUKE_LEADER = [1, 0.3, 0.16, 0.12];     // bots gang up with nukes on a leader only above this share of the world             // bots' city levels: at most 3 + this × their share of the world (0 = no cap)
 const DIFF = [
-  { name: 'Easy',   growth: 0.55, gold: 0.55, think: 40, thresh: 0.78, ratio: 0.22, nukes: 0, start: 0.7 },
-  { name: 'Normal', growth: 0.86, gold: 0.8, think: 28, thresh: 0.64, ratio: 0.3,  nukes: 1, start: 0.9 },
-  { name: 'Hard',   growth: 1.0,  gold: 1.0,  think: 16, thresh: 0.5,  ratio: 0.36, nukes: 2, start: 1.0 },
-  { name: 'Insane', growth: 1.2,  gold: 1.25, think: 10, thresh: 0.42, ratio: 0.45, nukes: 3, start: 1.25 },
+  { name: 'Easy',     growth: 0.55, gold: 0.55, think: 40, thresh: 0.78, ratio: 0.22, nukes: 0, start: 0.7 },
+  { name: 'Normal',   growth: 0.86, gold: 0.8,  think: 28, thresh: 0.64, ratio: 0.3,  nukes: 1, start: 0.9 },
+  { name: 'Hard',     growth: 1.0,  gold: 1.0,  think: 16, thresh: 0.5,  ratio: 0.36, nukes: 2, start: 1.0 },
+  { name: 'Insane',   growth: 1.2,  gold: 1.25, think: 10, thresh: 0.42, ratio: 0.45, nukes: 3, start: 1.25 },
+  { name: 'Hardcore', growth: 1.3,  gold: 1.35, think: 8,  thresh: 0.39, ratio: 0.49, nukes: 3, start: 1.35 },
+  { name: 'Ultra',    growth: 1.42, gold: 1.52, think: 6,  thresh: 0.34, ratio: 0.55, nukes: 4, start: 1.5 },
 ];
 const EMOJIS = ['😀', '😂', '😎', '😡', '😭', '🤝', '👋', '💀', '🔥', '👑', '🫡', '🤡', '❤️', '💣', '🏳️', '⚔️'];
 const TEAM_COLORS = [0xe8505b, 0x3d8bfd, 0x35c16a, 0xf2b632, 0xa66cf0, 0xf27a3d];
@@ -2665,7 +2695,7 @@ class Game {
       let t = this.nearestLand(nd[1] * map.w + nd[0], 40);
       if (t < 0) { p.alive = false; return; }
       this.takeProvince(p, t);
-      p.troops = 2600 * this.diff.start + p.tilesN * 0.6;
+      p.troops = 2000 * this.diff.start + p.tilesN * 0.6;
       p.gold = Math.round(60000 * this.goldPace);
       p.spawned = true;
     });
@@ -4121,6 +4151,8 @@ class Game {
 
   // ------------------------------------------------------------ AI
   stepAI() {
+    // Give the player a short opening before bot expansion begins.
+    if (this.phase === 1 && this.tick - this.startTick < 90) return;
     for (let i = 1; i < this.players.length; i++) {
       const p = this.players[i];
       if (!p.alive || !p.ai || !p.spawned) continue;
@@ -6377,7 +6409,7 @@ const Net = {
     const q = NET_Q;
     const o = {
       debug: 0,
-      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }, { urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp' }], iceCandidatePoolSize: 10, sdpSemantics: 'unified-plan' },
+      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }] },
     };
     if (q.get('peerhost')) { o.host = q.get('peerhost'); o.port = +(q.get('peerport') || 9000); o.path = q.get('peerpath') || '/'; o.secure = q.get('peersecure') === '1'; }
     return o;
@@ -8443,8 +8475,6 @@ const Menus = {
     if (res.error) {
       box.innerHTML = row('', 'ONLINE PLAY ISN\'T REACHABLE', esc(res.error), 'live', `<button class="jpill" data-pub="retry">RETRY</button>`);
     } else {
-      this._pub = res;
-      try { if (typeof Home !== 'undefined') { Home._pub = res; Home.livePanel && Home.livePanel(); } } catch (e) { console.warn('public lobby paint', e); }
       box.innerHTML = res.map(r => {
         if (r.empty) return row(MAPS[(r.slot * 5 + 3) % MAPS.length].th, 'OPEN LOBBY ' + (r.slot + 1), 'No match yet: host it, others can join', 'idle', `<button class="jpill" data-pub="host">HOST</button>`);
         const i = r.info, md = MAPS.find(m => m.id === i.mapId) || MAPS[0];
@@ -8477,7 +8507,7 @@ const Menus = {
       <div class="fld"><label>Map</label><div class="maps">${MAPS.map(m => `<button class="mapc ${m.id === s.mapId ? 'on' : ''}" data-map="${m.id}"><img src="${m.th}" alt=""><div>${esc(m.name)}<small>${m.n.length} nations</small></div></button>`).join('')}</div>
         <div class="note">${esc(md.desc)}</div></div>
       <div class="fld"><label>Game mode</label>${seg('rules', [['classic', 'Classic'], ['nukes', 'Nuke war'], ['blitz', 'Blitz']])}<div class="note" id="rulesNote">${RULES_NOTE[s.rules || 'classic']}</div></div>
-      <div class="fld"><label>Bot difficulty</label>${seg('difficulty', [[0, 'Easy'], [1, 'Normal'], [2, 'Hard'], [3, 'Insane']])}</div>
+      <div class="fld"><label>Bot difficulty</label>${seg('difficulty', [[0, 'Easy'], [1, 'Normal'], [2, 'Hard'], [3, 'Insane'], [4, 'Hardcore'], [5, 'Ultra']])}</div>
       <div class="fld"><label>Mode</label><div class="seg" data-seg="modeVal">${[['ffa', 'Free for all'], ['t2', '2 teams'], ['t3', '3 teams'], ['t4', '4 teams']].map(([v, l]) => `<button data-v="${v}" class="${modeVal === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
       <div class="fld"><label>Bot nations: <b id="natVal">${nat}</b></label><input type="range" id="natRange" min="0" max="${maxN}" value="${nat}"></div>
       <div class="fld"><label>Tribes (small neutral provinces)</label>${seg('tribes', [[0, 'None'], [1, 'Few'], [2, 'Normal'], [3, 'Many']])}</div>
@@ -8704,6 +8734,34 @@ const Menus = {
       case 9: { const k = Math.abs(Math.sin(x * 0.19 + Math.sin(y * 0.11) * 2.2) + Math.sin(y * 0.23 - x * 0.07)); c = k < 0.22 ? [255, 150 + 400 * k, 40] : [70 + r0 * 0.1, 22 + g0 * 0.08, 18]; break; }
       case 10: { const k = (Math.sin(x * 0.05 + Math.sin(y * 0.09) * 1.6) + 1) * 0.5; c = hsv(0.33 + k * 0.45).map(v => (v * 0.7 + 0.3) * 255); break; }
       case 11: { const k = (Math.sin(x * 0.04 + y * 0.03) + Math.sin(y * 0.07 - x * 0.02)) * 0.25 + 0.5; c = hash(x, y) > 0.973 ? [255, 255, 255] : [40 + 150 * k, 20 + 30 * k, 90 + 110 * (1 - k)]; break; }
+      case 12: { const hi = md(Math.floor(x / 8) + Math.floor(y / 8), 2) > 0.5; c = hi ? [r0 + (255 - r0) * 0.45, g0 + (255 - g0) * 0.45, b0 + (255 - b0) * 0.45] : [r0, g0, b0]; break; }
+      case 13: c = Math.sin((x + Math.sin(y * 0.18) * 5 + y * 0.4) * 0.42) > 0.35 ? [18, 13, 10] : [245, 140, 30]; break;
+      case 14: { const rw = Math.floor(y / 8), qx = md(x / 9 + 0.5 * md(rw, 2), 1), qy = md(y / 8, 1); c = Math.min(Math.min(qx, 1 - qx) * 1.1, Math.min(qy, 1 - qy)) < 0.11 ? [92, 51, 8] : [255, 184, 30]; break; }
+      case 15: { const k = Math.sin(x * 0.12 + Math.sin(y * 0.2) * 2); c = k > 0.93 ? [220, 247, 255] : [8 + 18 * (k * 0.5 + 0.5), 56 + 102 * (k * 0.5 + 0.5), 128 + 89 * (k * 0.5 + 0.5)]; break; }
+      case 16: { const k = Math.min(1, Math.abs(Math.sin((x + y) * 0.06 + Math.sin(x * 0.13) * 2 + Math.sin(y * 0.09) * 2)) / 0.25); c = [97 + 145 * k, 102 + 140 * k, 117 + 130 * k]; break; }
+      case 17: { const v = md((y + Math.sin(x * 0.05) * 6) / 90, 1); c = v < 0.5 ? [250 - 5 * v * 2, 191 - 115 * v * 2, 64 + 25 * v * 2] : [245 - 168 * (v - 0.5) * 2, 76 - 45 * (v - 0.5) * 2, 89 + 38 * (v - 0.5) * 2]; break; }
+      case 18: { const dr = md(y / 46 + hash(Math.floor(x / 5), 1), 1), k = Math.max(0, (dr - 0.7) / 0.3); c = [10 + 105 * k, 31 + 224 * k, 13 + 38 * k]; break; }
+      case 19: c = (md(x, 12) < 3 && hash(Math.floor(x / 12), Math.floor(y / 24)) > 0.5) || (md(y, 12) < 3 && hash(Math.floor(x / 24), Math.floor(y / 12) + 9) > 0.5) ? [51, 240, 178] : [8, 26, 23]; break;
+      case 20: c = hash(Math.floor(x / 4), Math.floor(y / 4)) > 0.84 ? [255, 244, 250] : [250, 184, 209]; break;
+      case 21: { const v = Math.sin(x * 0.06) + Math.sin(y * 0.08) + Math.sin((x + y) * 0.05); c = hsv(md(v * 0.16 + 0.5, 1)).map(q => (q * 0.85 + 0.15) * 255); break; }
+      case 22: { const f = Math.min(Math.abs(md((x + y) / 14, 1) - 0.5), Math.abs(md((x - y) / 14, 1) - 0.5)) * 2; c = [64 + 153 * f, 178 + 72 * f, 242 + 13 * f]; break; }
+      case 23: { const a = Math.max(md(x, 6) < 0.5 || md(y, 6) < 0.5 ? 0.35 : 0, md(x, 24) < 1 || md(y, 24) < 1 ? 0.8 : 0); c = [13 + 178 * a, 61 + 163 * a, 140 + 115 * a]; break; }
+      case 24: { const k = (Math.sin(x * 0.07 + Math.sin(y * 0.05) * 2) + Math.sin(y * 0.06 - x * 0.03)) * 2, s = Math.max(0, Math.min(1, (k + 2) / 4)), sm = s * s * (3 - 2 * s);
+        c = k - Math.floor(k) < 0.14 ? [82, 64, 41] : [209 - 69 * sm, 194 - 15 * sm, 148 - 33 * sm]; break; }
+      case 25: { const h = md((x + y) * 0.004 + Math.sin(y * 0.05) * 0.1, 1), sc = md(y, 4) < 1 ? 1 : 0.86; c = hsv(h).map(v => (v * 0.6 + 0.4) * 255 * sc); break; }
+      case 26: { const alt = md(Math.floor(x / 4) + Math.floor(y / 4), 2), v = alt < 0.5 ? md(x / 4, 1) : md(y / 4, 1), k = (0.5 + 0.5 * Math.sin(v * Math.PI)) * (0.6 + 0.4 * alt); c = [23 + 46 * k, 26 + 46 * k, 31 + 46 * k]; break; }
+      case 27: c = Math.sin((y + Math.sin(x * 0.15) * 4 + x * 0.35) * 0.55) > 0 ? [245, 245, 245] : [20, 20, 20]; break;
+      case 28: { const qx = md(x / 9 + 0.5 * md(Math.floor(y / 9), 2), 1) - 0.5, qy = md(y / 9, 1) - 0.5; c = Math.hypot(qx, qy) < 0.3 ? [r0 + (255 - r0) * 0.45, g0 + (255 - g0) * 0.45, b0 + (255 - b0) * 0.45] : [r0, g0, b0]; break; }
+      case 29: { const rw = Math.floor(y / 6), bx = x / 12 + 0.5 * md(rw, 2), k = 0.85 + 0.3 * hash(Math.floor(bx), rw); c = (md(bx, 1) < 0.1 || md(y / 6, 1) < 0.18) ? [199, 189, 173] : [168 * k, 61 * k, 41 * k]; break; }
+      case 30: { const v = md(y / 80, 1), gr = (md(x, 10) < 0.7 || md(y, 10) < 0.7) ? 0.55 : 0, g = [255 - 204 * v, 92 + 138 * v, 199 + 56 * v]; c = g.map(q => q * 0.75 * (1 - gr) + 255 * gr); break; }
+      case 31: { const k = Math.abs(Math.sin(x * 0.11 + Math.sin(y * 0.07) * 3) * Math.sin(y * 0.13 + Math.sin(x * 0.05) * 3)), s = Math.max(0, Math.min(1, k / 0.08)), sm = s * s * (3 - 2 * s), h = hash(Math.floor(x / 14), Math.floor(y / 14)), ice = [115 - 64 * h, 199 - 71 * h, 242 - 25 * h]; c = [242 + (ice[0] - 242) * sm, 252 + (ice[1] - 252) * sm, 255 + (ice[2] - 255) * sm]; break; }
+      case 32: { const cl = Math.floor(x / 3), dr = md(y / 40 + hash(cl, 3), 1), on = (hash(cl, Math.floor(y / 3)) > 0.5 && md(x, 3) < 1.9) ? 1 : 0, k = dr * dr * dr * on, w = dr > 0.97 ? on : 0; c = [64 * k + 153 * w, 15 + 255 * k + 255 * w, 5 + 115 * k + 178 * w]; break; }
+      case 33: { const qx = Math.abs(md(x / 12, 1) - 0.5), qy = Math.abs(md(y / 12, 1) - 0.5), dd = qx + qy; c = dd < 0.12 ? [255, 209, 77] : Math.abs(dd - 0.36) < 0.035 ? [217, 166, 51] : dd > 0.36 ? [51, 13, 92] : [84, 26, 128]; break; }
+      case 34: { const n = Math.sin(x * 0.2 + Math.sin(y * 0.1) * 2) + Math.sin(y * 0.16 + Math.sin(x * 0.09) * 2), k = n * 0.25 + 0.5, s1 = Math.max(0, Math.min(1, (k - 0.2) / 0.4)), s2 = Math.max(0, Math.min(1, (k - 0.68) / 0.27)), a = [89 + 166 * s1, 5 + 84 * s1, 5 * s1]; c = [a[0] + (255 - a[0]) * s2, a[1] + (235 - a[1]) * s2, a[2] + (102 - a[2]) * s2]; break; }
+      case 35: { const k = Math.abs(Math.sin(x * 0.09 + Math.sin(y * 0.06) * 2.6) + Math.sin(y * 0.11 - Math.sin(x * 0.04) * 2.2)), v = Math.max(0, Math.min(1, 1 - k / 0.16)) * 0.85; c = hash(x, y) > 0.992 ? [220, 220, 230] : [8 + 183 * v, 5 + 72 * v, 18 + 237 * v]; break; }
+      case 36: { const qx = x / 16, qy = y / 16, tri = md(qx, 1) + md(qy, 1) < 1 ? 1 : 0, h = md(hash(Math.floor(qx) + tri * 17, Math.floor(qy) + tri * 17) + (x + y) * 0.002, 1); c = hsv(h).map(q => (q * 0.75 + 0.25) * (0.8 + 0.2 * tri) * 255); break; }
+      case 37: { const v = md((y + Math.abs(md(x, 16) - 8)) / 12, 1), e = v > 0.92 ? 128 : 0; c = v > 0.55 ? [51 + e, 242, 217 + e * 0.3] : [5 + e, 77 + e, 92 + e]; break; }
+      case 38: { const b = md((x + y) / 18, 1) > 0.5, sh = Math.pow(Math.max(0, Math.sin((x - y) * 0.03)), 10) * (b ? 0.85 : 0.25); c = b ? [255, 194 + 48 * sh, 51 + 128 * sh] : [18 + 255 * sh, 15 + 242 * sh, 13 + 178 * sh]; break; }
       default: c = [r0, g0, b0];
     }
     return c.map(v => Math.max(0, Math.min(255, Math.round(v))));
@@ -9082,8 +9140,8 @@ const Menus = {
     // 4: the burst
     const burst = () => {
       phase = 'burst';
-      Audio2.play('crate'); shake(16, 0.4); flash(0.05, 500);
-      ring('#fff', LY, 120, 1200, 700); sparks(30, cr.c1, LY, 260, 460);
+      Audio2.play('crate'); Audio2.play('bigslam', 0.7); shake(18, 0.45); flash(0.05, 500);
+      ring('#fff', LY, 120, 1200, 700); sparks(46, cr.c1, LY, 260, 460);
       crateXf(0, 0, 1.08, 1.08); crate.classList.add('burst');
       st.style.setProperty('--ray', '#ffffff'); rays.style.opacity = 0.55;
       setTimeout(() => { st.style.setProperty('--ray', cr.c1); rays.style.opacity = ''; }, 500);
@@ -9123,7 +9181,7 @@ const Menus = {
       st.appendChild(bn);
       anim(bn, [{ transform: 'translate(-50%,-50%) scale(2.6)', opacity: 0 }, { opacity: 1, offset: 0.35 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], 340, 'cubic-bezier(.34,1.56,.64,1)');
       st.style.setProperty('--ray', rc); rays.classList.add('big'); raySpeed = 14;
-      ring(rc, RY, 140, 760, 800); sparks(22, rc, RY, 160, 300);
+      ring(rc, RY, 140, 760, 800); sparks(22 + rank * 8, rc, RY, 160, 300 + rank * 40);
       if (rank >= 3) Cine.confetti(ov, rank >= 4 ? 90 : 50, [rc, '#ffffff', rc]);
       if (rank >= 4) setTimeout(() => { if (!ov.isConnected) return; flash(0.2, 600); Audio2.play('boom', 0.5); ring('#fff', RY, 80, 1100, 1100); shake(14, 0.4); }, 300);
       setTimeout(prize, skipped ? 500 : 900);
